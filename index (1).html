@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GourmetDash | Ăn Ngon Mỗi Ngày</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#a04100',
+                        'primary-container': '#ff6b00',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface">
+
+<!-- ===================== PAGE: HOME ===================== -->
+<div id="page-home" class="page active">
+    <header class="fixed top-0 w-full z-50 glass-panel shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="#" onclick="navigate('home')" class="text-2xl font-black text-primary font-headline uppercase tracking-tight">GourmetDash</a>
+                <div class="hidden md:flex relative group">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+                    <input type="text" id="mainSearch" placeholder="Tìm món ăn..." class="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full w-64 focus:ring-2 focus:ring-primary/20 transition-all">
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4">
+                    <a href="#" onclick="navigate('cart')" class="relative p-2 hover:bg-slate-100 rounded-full transition-colors group">
+                        <i data-lucide="shopping-cart" class="w-6 h-6 text-on-surface"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full hidden">0</span>
+                    </a>
+                    <div id="userProfile" class="flex items-center gap-3 ml-2 cursor-pointer group">
+                        <a href="#" onclick="navigate('login')" class="bg-primary-container text-white px-6 py-2 rounded-full font-bold hover:scale-105 transition-all active:scale-95">Đăng nhập</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="pt-32 pb-20 px-4">
+        <div class="max-w-7xl mx-auto relative rounded-3xl overflow-hidden min-h-[500px] flex items-center">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop" alt="Hero Banner" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+            <div class="relative z-10 px-12 md:px-24">
+                <h1 class="text-white font-headline font-extrabold text-6xl md:text-8xl leading-tight mb-8">
+                    ĂN NGON <br> <span style="color:#ff6b00">MỖI NGÀY</span>
+                </h1>
+                <p class="text-white/80 text-xl max-w-lg mb-10">Khám phá tinh hoa ẩm thực được tuyển chọn bởi những đầu bếp hàng đầu.</p>
+                <button onclick="document.getElementById('menu-section').scrollIntoView({behavior:'smooth'})" class="bg-primary-container text-white px-10 py-4 rounded-full font-black text-lg hover:scale-105 transition-all shadow-xl shadow-primary/30 click-effect">KHÁM PHÁ NGAY</button>
+            </div>
+        </div>
+    </section>
+
+    <main id="menu-section" class="max-w-7xl mx-auto px-4 pb-32">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-8 mb-12">
+            <div>
+                <h2 class="text-4xl font-headline font-extrabold mb-4">Thực Đơn <span class="text-primary italic">Hôm Nay</span></h2>
+                <div class="flex gap-2 flex-wrap" id="categoryFilters">
+                    <button onclick="filterCategory('All')" class="category-btn active px-6 py-2 rounded-full border border-slate-200 font-bold hover:border-primary transition-all bg-white text-on-surface">Tất cả</button>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <select id="priceSort" onchange="sortProducts()" class="bg-white border border-slate-200 px-6 py-2 rounded-full font-bold focus:ring-primary/20 hover:border-primary transition-all">
+                    <option value="none">Sắp xếp theo giá</option>
+                    <option value="asc">Giá thấp đến cao</option>
+                    <option value="desc">Giá cao đến thấp</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="hotSection" class="mb-16 hidden">
+            <h3 class="text-xl font-bold text-orange-600 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <i data-lucide="flame" class="w-5 h-5 fill-orange-600"></i> Sản phẩm đang hot
+            </h3>
+            <div id="hotGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+        </div>
+
+        <div id="discountSection" class="mb-16 hidden">
+            <h3 class="text-xl font-bold text-red-600 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <i data-lucide="tag" class="w-5 h-5 fill-red-600"></i> Đang giảm giá
+            </h3>
+            <div id="discountGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+        </div>
+
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+
+        <div id="noResults" class="hidden py-32 text-center text-slate-400">
+            <i data-lucide="search-x" class="mx-auto w-16 h-16 mb-4"></i>
+            <p class="text-xl font-medium">Không tìm thấy món ăn phù hợp.</p>
+        </div>
+    </main>
+</div>
+
+<!-- ===================== PAGE: CART ===================== -->
+<div id="page-cart" class="page">
+    <header class="fixed top-0 w-full z-50 glass-panel shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <a href="#" onclick="navigate('home')" class="text-2xl font-black text-primary font-headline uppercase tracking-tight">GourmetDash</a>
+            <div id="cartHeaderActions" class="flex items-center gap-6"></div>
+        </nav>
+    </header>
+    <main class="pt-32 pb-32 px-4 max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-12">
+            <h1 class="text-4xl font-headline font-extrabold tracking-tight">Giỏ Hàng Của <span class="text-primary italic">Bạn</span></h1>
+            <a href="#" onclick="navigate('home')" class="text-primary font-bold flex items-center gap-2 hover:underline">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i> Tiếp tục mua sắm
+            </a>
+        </div>
+        <div class="flex flex-col lg:flex-row gap-12">
+            <div class="flex-1 space-y-6" id="cartItems"></div>
+            <aside class="w-full lg:w-96">
+                <div class="bg-white p-8 rounded-3xl shadow-xl sticky top-32">
+                    <h2 class="text-2xl font-bold mb-6">Tóm tắt đơn hàng</h2>
+                    <div class="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <label class="block text-xs font-black uppercase text-slate-400 mb-2">Mã giảm giá</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="couponInput" placeholder="Nhập mã..." class="flex-1 px-4 py-2 rounded-xl bg-white border border-slate-200 focus:ring-2 focus:ring-primary/20 transition-all text-sm uppercase font-bold">
+                            <button onclick="applyCoupon()" class="bg-on-surface text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-primary transition-all" style="background:#161d1f">ÁP DỤNG</button>
+                        </div>
+                        <div id="couponMessage" class="mt-2 text-[10px] font-bold hidden"></div>
+                    </div>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between text-slate-500">
+                            <span>Tạm tính</span>
+                            <span id="subtotal" class="font-bold text-on-surface">0₫</span>
+                        </div>
+                        <div id="discountRow" class="hidden flex justify-between text-red-500 font-bold">
+                            <span id="discountLabel">Giảm giá (--)</span>
+                            <span id="discountAmount">-0₫</span>
+                        </div>
+                        <div class="flex justify-between text-slate-500">
+                            <span>Phí vận chuyển</span>
+                            <span class="font-bold text-on-surface">Miễn phí</span>
+                        </div>
+                        <div class="border-t border-slate-100 pt-4 flex justify-between items-end">
+                            <span class="font-bold text-lg">Tổng cộng</span>
+                            <span id="totalCost" class="text-3xl font-black text-primary">0₫</span>
+                        </div>
+                    </div>
+                    <div id="checkoutForm" class="space-y-4 mb-8">
+                        <h3 class="font-bold text-lg mb-2">Thông tin giao hàng</h3>
+                        <input type="text" id="order-fullname" placeholder="Họ và tên" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        <input type="tel" id="order-phone" placeholder="Số điện thoại" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        <textarea id="order-address" placeholder="Địa chỉ giao hàng chi tiết" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all h-24"></textarea>
+                    </div>
+                    <button onclick="processCheckout()" class="w-full bg-primary-gradient text-white py-5 rounded-2xl font-black text-xl shadow-xl shadow-primary/30 hover:scale-[1.02] transition-all click-effect">
+                        THANH TOÁN NGAY
+                    </button>
+                    <p class="text-center text-xs text-slate-400 mt-6 flex items-center justify-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i> Giao dịch được bảo mật 100%
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </main>
+</div>
+
+<!-- ===================== PAGE: ORDERS ===================== -->
+<div id="page-orders" class="page">
+    <header class="fixed top-0 w-full z-50 glass-panel shadow-sm">
+        <nav class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <a href="#" onclick="navigate('home')" class="text-2xl font-black text-primary font-headline uppercase tracking-tight">GourmetDash</a>
+            <div id="ordersHeaderActions" class="flex items-center gap-6"></div>
+        </nav>
+    </header>
+    <main class="pt-32 pb-32 px-4 max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-12">
+            <h1 class="text-4xl font-headline font-extrabold tracking-tight">Đơn Hàng Của <span class="text-primary italic">Bạn</span></h1>
+            <a href="#" onclick="navigate('home')" class="text-primary font-bold flex items-center gap-2 hover:underline">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i> Về trang chủ
+            </a>
+        </div>
+        <div id="orderList" class="space-y-8"></div>
+        <div id="emptyOrders" class="hidden py-32 text-center text-slate-400">
+            <i data-lucide="package" class="mx-auto w-16 h-16 mb-4"></i>
+            <p class="text-xl font-medium">Bạn chưa có đơn hàng nào.</p>
+            <a href="#" onclick="navigate('home')" class="mt-6 inline-block bg-primary-container text-white px-8 py-3 rounded-full font-bold">MUA SẮM NGAY</a>
+        </div>
+    </main>
+</div>
+
+<!-- ===================== PAGE: LOGIN ===================== -->
+<div id="page-login" class="page">
+    <div class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden">
+            <div class="p-8">
+                <div class="text-center mb-10">
+                    <a href="#" onclick="navigate('home')" class="inline-block text-3xl font-black text-primary font-headline uppercase tracking-tight mb-4">GourmetDash</a>
+                    <h2 class="text-2xl font-bold text-on-surface">Chào mừng trở lại!</h2>
+                    <p class="text-slate-500 mt-2">Đăng nhập để khám phá vũ trụ ẩm thực</p>
+                </div>
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Tên đăng nhập</label>
+                        <input type="text" id="username" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Mật khẩu</label>
+                        <input type="password" id="password" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" class="rounded text-primary focus:ring-primary/20">
+                            <span>Ghi nhớ tôi</span>
+                        </label>
+                        <a href="#" class="text-primary font-bold hover:underline">Quên mật khẩu?</a>
+                    </div>
+                    <button type="submit" class="w-full bg-primary-gradient text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all shadow-lg shadow-primary/20 click-effect">
+                        ĐĂNG NHẬP
+                    </button>
+                </form>
+                <div class="relative my-8">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
+                    <div class="relative flex justify-center text-sm"><span class="px-4 bg-white text-slate-400">Hoặc tiếp tục với</span></div>
+                </div>
+                <button onclick="simulateGoogleLogin()" class="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-4 rounded-xl font-bold hover:bg-slate-50 transition-all click-effect">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 5.04c1.94 0 3.68.67 5.05 1.97l3.77-3.77C18.52 1.05 15.54 0 12 0 7.37 0 3.39 2.67 1.45 6.57l4.41 3.43c1.07-3.21 4.08-5.57 6.14-5.57z"></path><path fill="#FBBC05" d="M23.49 12.27c0-.8-.07-1.56-.19-2.31H12v4.51h6.47c-.28 1.48-1.11 2.74-2.36 3.58l3.69 2.87c2.16-1.99 3.39-4.93 3.39-8.65z"></path><path fill="#4285F4" d="M12 24c3.24 0 5.95-1.07 7.94-2.91L16.25 18.22c-1.12.75-2.55 1.2-4.25 1.2-3.28 0-6.07-2.22-7.06-5.21l-4.41 3.42C2.53 21.05 6.95 24 12 24z"></path><path fill="#34A853" d="M4.94 14.21c-.25-.75-.39-1.55-.39-2.39s.14-1.64.39-2.39L.53 5.92C.19 7.02 0 8.18 0 12c0 3.82.19 4.98.53 6.08l4.41-3.41z"></path></svg>
+                    Google
+                </button>
+                <p class="text-center mt-8 text-slate-500">
+                    Chưa có tài khoản? <a href="#" onclick="navigate('register')" class="text-primary font-bold hover:underline">Đăng ký ngay</a>
+                </p>
+            </div>
+            <div class="bg-slate-50 text-center py-4">
+                <a href="#" onclick="navigate('home')" class="text-sm font-bold text-slate-400 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: REGISTER ===================== -->
+<div id="page-register" class="page">
+    <div class="bg-slate-50 flex items-center justify-center min-h-screen p-4">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden my-8">
+            <div class="p-8">
+                <div class="text-center mb-10">
+                    <a href="#" onclick="navigate('home')" class="inline-block text-3xl font-black text-primary font-headline uppercase tracking-tight mb-4">GourmetDash</a>
+                    <h2 class="text-2xl font-bold text-on-surface">Tham gia cùng chúng tôi</h2>
+                    <p class="text-slate-500 mt-2">Bắt đầu hành trình ẩm thực tinh tế</p>
+                </div>
+                <form id="registerForm" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Họ và tên</label>
+                        <input type="text" id="fullname" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Tên đăng nhập</label>
+                        <input type="text" id="reg-username" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Mật khẩu</label>
+                        <input type="password" id="reg-password" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-on-surface mb-2">Xác nhận mật khẩu</label>
+                        <input type="password" id="reg-repassword" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                        <input type="checkbox" required class="rounded text-primary focus:ring-primary/20">
+                        <span>Tôi đồng ý với <a href="#" class="text-primary font-bold hover:underline">Điều khoản & Điều kiện</a></span>
+                    </div>
+                    <button type="submit" class="w-full bg-primary-gradient text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all shadow-lg shadow-primary/20 click-effect">
+                        ĐĂNG KÝ NGAY
+                    </button>
+                </form>
+                <p class="text-center mt-8 text-slate-500">
+                    Đã có tài khoản? <a href="#" onclick="navigate('login')" class="text-primary font-bold hover:underline">Đăng nhập ngay</a>
+                </p>
+            </div>
+            <div class="bg-slate-50 text-center py-4">
+                <a href="#" onclick="navigate('home')" class="text-sm font-bold text-slate-400 hover:text-primary transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Quay lại trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: ADMIN ===================== -->
+<div id="page-admin" class="page">
+    <div class="bg-slate-50 min-h-screen">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar shadow-2xl z-40">
+            <div class="p-8">
+                <a href="#" onclick="navigate('home')" class="text-2xl font-black text-primary font-headline uppercase tracking-tight block mb-10">GourmetDash</a>
+                <nav class="space-y-2">
+                    <button onclick="switchTab('dashboard')" class="admin-nav-btn active w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all group">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> Dashboard
+                    </button>
+                    <button onclick="switchTab('products')" class="admin-nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all group">
+                        <i data-lucide="utensils-crossed" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> Sản phẩm
+                    </button>
+                    <button onclick="switchTab('orders')" class="admin-nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all group">
+                        <i data-lucide="shopping-bag" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> Đơn hàng
+                    </button>
+                    <button onclick="switchTab('users')" class="admin-nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all group">
+                        <i data-lucide="users" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> Người dùng
+                    </button>
+                    <button onclick="switchTab('coupons')" class="admin-nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all group">
+                        <i data-lucide="ticket" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> Mã giảm giá
+                    </button>
+                    <button onclick="switchTab('statistics')" class="admin-nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all group">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 group-hover:scale-110 transition-transform"></i> Thống kê
+                    </button>
+                </nav>
+            </div>
+            <div class="absolute bottom-0 w-full p-8 border-t border-slate-100 bg-white">
+                <div id="adminProfile" class="flex items-center gap-3"></div>
+                <button onclick="logout()" class="mt-6 w-full flex items-center justify-center gap-2 text-slate-400 hover:text-red-500 font-bold transition-colors">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-content min-h-screen">
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="tab-content">
+                <h1 class="text-3xl font-headline font-extrabold mb-10">Tổng quan <span class="text-primary italic">Hệ thống</span></h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-400 font-bold uppercase tracking-widest text-xs mb-2">Tổng đơn hàng</p>
+                            <h2 id="stat-totalOrders" class="text-4xl font-headline font-black">0</h2>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-2xl text-blue-500"><i data-lucide="shopping-cart" class="w-8 h-8"></i></div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-400 font-bold uppercase tracking-widest text-xs mb-2">Tổng doanh thu</p>
+                            <h2 id="stat-totalRevenue" class="text-4xl font-headline font-black">0₫</h2>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-2xl text-green-500"><i data-lucide="dollar-sign" class="w-8 h-8"></i></div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-400 font-bold uppercase tracking-widest text-xs mb-2">Tổng sản phẩm</p>
+                            <h2 id="stat-totalProducts" class="text-4xl font-headline font-black">0</h2>
+                        </div>
+                        <div class="bg-orange-50 p-4 rounded-2xl text-orange-500"><i data-lucide="box" class="w-8 h-8"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="tab-products" class="tab-content hidden">
+                <div class="flex items-center justify-between mb-10">
+                    <h1 class="text-3xl font-headline font-extrabold">Quản lý <span class="text-primary italic">Sản phẩm</span></h1>
+                    <button onclick="openProductModal()" class="bg-primary-container text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-primary/20">
+                        <i data-lucide="plus" class="w-5 h-5"></i> THÊM MÓN MỚI
+                    </button>
+                </div>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Sản phẩm</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Giá</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Giảm giá</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Kho</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Đã bán</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Hot</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminProductList" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="tab-orders" class="tab-content hidden">
+                <h1 class="text-3xl font-headline font-extrabold mb-10">Quản lý <span class="text-primary italic">Đơn hàng</span></h1>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Đơn hàng</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Khách hàng</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Trạng thái</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Tổng tiền</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminOrderList" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="tab-users" class="tab-content hidden">
+                <h1 class="text-3xl font-headline font-extrabold mb-10">Quản lý <span class="text-primary italic">Người dùng</span></h1>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Cá nhân</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Username</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Tổng đơn</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUserList" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div id="tab-statistics" class="tab-content hidden">
+                <h1 class="text-3xl font-headline font-extrabold mb-10">Thống kê <span class="text-primary italic">Kinh doanh</span></h1>
+                <div class="flex gap-4 mb-8">
+                    <button onclick="switchStatsTab('products')" id="stats-nav-products" class="stats-tab-btn active px-8 py-3 rounded-full font-bold border border-slate-200 transition-all hover:border-primary">Sản phẩm</button>
+                    <button onclick="switchStatsTab('revenue')" id="stats-nav-revenue" class="stats-tab-btn px-8 py-3 rounded-full font-bold border border-slate-200 transition-all hover:border-primary">Doanh thu</button>
+                </div>
+                <div id="stats-products-content">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-bold">Thống kê lượng bán sản phẩm</h2>
+                            <select id="statsProductSort" onchange="renderStatsProducts()" class="bg-slate-50 border-none px-4 py-2 rounded-xl font-bold text-sm">
+                                <option value="sold-desc">Bán nhiều nhất</option>
+                                <option value="sold-asc">Bán ít nhất</option>
+                                <option value="name">Theo tên</option>
+                            </select>
+                        </div>
+                        <div class="space-y-6" id="topSellingList"></div>
+                    </div>
+                </div>
+                <div id="stats-revenue-content" class="hidden space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                            <p class="text-[10px] font-black uppercase text-slate-400 mb-1">Hôm nay</p>
+                            <h3 id="rev-today" class="text-2xl font-headline font-black text-on-surface">0₫</h3>
+                            <div id="rev-trend" class="mt-2 text-[10px] font-bold">--</div>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                            <p class="text-[10px] font-black uppercase text-slate-400 mb-1">Tuần này</p>
+                            <h3 id="rev-week" class="text-2xl font-headline font-black text-on-surface">0₫</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                            <p class="text-[10px] font-black uppercase text-slate-400 mb-1">Tháng này</p>
+                            <h3 id="rev-month" class="text-2xl font-headline font-black text-on-surface">0₫</h3>
+                        </div>
+                        <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                            <p class="text-[10px] font-black uppercase text-slate-400 mb-1">Tổng cộng</p>
+                            <h3 id="rev-total" class="text-2xl font-headline font-black text-primary">0₫</h3>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                        <h2 class="text-xl font-bold mb-6">Doanh thu theo ngày</h2>
+                        <div class="overflow-hidden">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50 border-b border-slate-100">
+                                    <tr>
+                                        <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Ngày</th>
+                                        <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Số đơn</th>
+                                        <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">Doanh thu</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="revenueTableBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupons Tab -->
+            <div id="tab-coupons" class="tab-content hidden">
+                <div class="flex items-center justify-between mb-10">
+                    <h1 class="text-3xl font-headline font-extrabold">Quản lý <span class="text-primary italic">Mã giảm giá</span></h1>
+                    <button onclick="openCouponModal()" class="bg-primary-container text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:scale-105 transition-all shadow-lg shadow-primary/20">
+                        <i data-lucide="plus" class="w-5 h-5"></i> TẠO MÃ MỚI
+                    </button>
+                </div>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Mã / Tên</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Giảm (%)</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Thời gian</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Áp dụng</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">Trạng thái</th>
+                                <th class="px-8 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminCouponList" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Product Modal -->
+        <div id="productModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeProductModal()"></div>
+            <div class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-slideUp">
+                <div class="p-8">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 id="modalTitle" class="text-2xl font-bold">Thêm món ăn mới</h2>
+                        <button onclick="closeProductModal()" class="p-2 hover:bg-slate-100 rounded-full transition-all"><i data-lucide="x"></i></button>
+                    </div>
+                    <form id="productForm" class="grid grid-cols-2 gap-6">
+                        <input type="hidden" id="edit-id">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Tên món ăn</label>
+                            <input type="text" id="p-name" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Giá (₫)</label>
+                            <input type="number" id="p-price" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Danh mục</label>
+                            <select id="p-category" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                                <option value="Starters">Khai vị</option>
+                                <option value="Main Course">Món chính</option>
+                                <option value="Seafood">Hải sản</option>
+                                <option value="Desserts">Tráng miệng</option>
+                                <option value="Drinks">Đồ uống</option>
+                            </select>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Số lượng kho</label>
+                            <input type="number" id="p-quantity" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Hình ảnh</label>
+                            <div class="flex items-center gap-4">
+                                <div class="relative flex-1">
+                                    <input type="file" id="p-image-file" accept="image/*" onchange="previewImage(this)" class="hidden">
+                                    <button type="button" onclick="document.getElementById('p-image-file').click()" class="w-full flex items-center justify-center gap-2 bg-slate-50 border-2 border-dashed border-slate-200 py-4 rounded-xl hover:bg-slate-100 transition-all">
+                                        <i data-lucide="image-plus" class="text-slate-400"></i>
+                                        <span class="text-slate-400 font-bold">Tải ảnh lên</span>
+                                    </button>
+                                </div>
+                                <div id="preview-container" class="w-20 h-20 bg-slate-100 rounded-xl hidden overflow-hidden">
+                                    <img id="modal-image-preview" src="" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-span-2 pt-4">
+                            <button type="submit" class="w-full bg-primary-gradient text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-primary/20 click-effect">
+                                LƯU THÔNG TIN
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Details Modal -->
+        <div id="orderModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeOrderModal()"></div>
+            <div class="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-slideUp">
+                <div class="p-8">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 class="text-2xl font-bold">Chi tiết đơn hàng</h2>
+                        <button onclick="closeOrderModal()" class="p-2 hover:bg-slate-100 rounded-full transition-all"><i data-lucide="x"></i></button>
+                    </div>
+                    <div id="orderDetailsContent" class="space-y-6"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Coupon Modal -->
+        <div id="couponModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeCouponModal()"></div>
+            <div class="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-slideUp">
+                <div class="p-8">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2 id="couponModalTitle" class="text-2xl font-bold">Tạo mã giảm giá mới</h2>
+                        <button onclick="closeCouponModal()" class="p-2 hover:bg-slate-100 rounded-full transition-all"><i data-lucide="x"></i></button>
+                    </div>
+                    <form id="couponForm" class="grid grid-cols-2 gap-6">
+                        <input type="hidden" id="edit-coupon-id">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Tên mã (Code)</label>
+                            <input type="text" id="c-code" required placeholder="VD: GIAM10" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Phần trăm giảm (%)</label>
+                            <select id="c-percent" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                                <option value="5">5%</option>
+                                <option value="10">10%</option>
+                                <option value="20">20%</option>
+                                <option value="30">30%</option>
+                                <option value="custom">Tự nhập...</option>
+                            </select>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Số % cụ thể</label>
+                            <input type="number" id="c-percent-custom" placeholder="Nhập số %" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Ngày bắt đầu</label>
+                            <input type="date" id="c-start" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Ngày kết thúc</label>
+                            <input type="date" id="c-end" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-bold text-slate-500 mb-2">Phạm vi áp dụng</label>
+                            <select id="c-scope" class="w-full px-4 py-3 rounded-xl bg-slate-50 border-none focus:ring-2 focus:ring-primary/20 transition-all">
+                                <option value="all">Toàn bộ website</option>
+                                <option value="specific">Chỉ một số sản phẩm (Chọn sau)</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input type="checkbox" id="c-active" checked class="w-5 h-5 accent-primary">
+                                <span class="font-bold text-slate-500">Kích hoạt mã ngay</span>
+                            </label>
+                        </div>
+                        <div class="col-span-2 pt-4">
+                            <button type="submit" class="w-full bg-primary-gradient text-white py-4 rounded-xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-primary/20 click-effect">
+                                LƯU MÃ GIẢM GIÁ
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="./script.js"></script>
+</body>
+</html>
